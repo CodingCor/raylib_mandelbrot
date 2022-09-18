@@ -1,4 +1,2 @@
-# TODO
+# Mandelbrot-Set
 
-- [x] Static Builds working
-- [ ] Shared Builds working 
