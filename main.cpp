@@ -7,10 +7,17 @@
 ///
 int screenWidth = 800;
 int screenHeight = 800;
+
 const double STARTSIZE = 4.0;
 const int MAXITERATIONS = 100;
+const double SIZEINCREASE = 0.1;
+
+static double s_currentSize = STARTSIZE;
+static double xOff = 0.0;
+static double yOff = 0.0;
 
 void UpdateDrawFrame(void);     // Update and Draw one frame
+void updateLogic();
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Mandelbrot-Set");
@@ -18,12 +25,33 @@ int main() {
     SetTargetFPS(15);   // Set our game to run at 60 frames-per-second
 
     while (!WindowShouldClose()){
+        updateLogic();
         UpdateDrawFrame();
     }
 
     CloseWindow();        // Close window and OpenGL context
 
     return 0;
+}
+
+void updateLogic(){
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        s_currentSize += SIZEINCREASE;
+        std::cout << "LEFT" << std::endl;
+
+        //int xPosition = GetMouseX();
+        //int yPosition = GetMouseY();
+        //xOff = (double)(xPosition) / (double)(screenWidth) * STARTSIZE - STARTSIZE/2.0; 
+        //yOff = (double)(yPosition) / (double)(screenHeight) * STARTSIZE - STARTSIZE/2.0;
+
+    }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
+        s_currentSize -= SIZEINCREASE;
+        std::cout << "RIGHT" << std::endl;
+        //int xPosition = GetMouseX();
+        //int yPosition = GetMouseY();
+        //xOff = (double)(xPosition) / (double)(screenWidth) * STARTSIZE - STARTSIZE/2.0; 
+        //yOff = (double)(yPosition) / (double)(screenHeight) * STARTSIZE - STARTSIZE/2.0;
+    }
 }
 
 void UpdateDrawFrame(void) {
@@ -33,8 +61,9 @@ void UpdateDrawFrame(void) {
 
         for(int x = 0; x < screenWidth; x++){
             for(int y = 0; y < screenHeight; y++){
-                double a = (double)(x) / (double)(screenWidth) * STARTSIZE - STARTSIZE/2.0;
-                double b = (double)(y) / (double)(screenHeight) * STARTSIZE - STARTSIZE/2.0;
+                double a = (double)(x) / (double)(screenWidth) * s_currentSize - s_currentSize/2.0;
+                int yPosition = screenHeight - y;
+                double b = (double)(yPosition) / (double)(screenHeight) * s_currentSize - s_currentSize/2.0;
 
                 const double ca = a;
                 const double cb = b;
