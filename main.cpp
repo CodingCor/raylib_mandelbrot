@@ -15,6 +15,8 @@ const double SIZEINCREASE = 0.1;
 const int SIZECHANGEPERCENT = 10;
 
 static double s_currentSize = STARTSIZE;
+static double xOff = 0.0;
+static double yOff = 0.0;
 
 void UpdateDrawFrame(void);     // Update and Draw one frame
 void updateLogic();
@@ -52,7 +54,17 @@ double getRelativePositionY(const int screenPositionY){
 }
 
 void updateLogic(){
+    if(IsKeyDown(KEY_SPACE)){
+        double xOff = getRelativePositionX(GetMouseX());
+        double yOff = getRelativePositionY(GetMouseY());
+
+        std::cout << "RECENTER TO: " << xOff << ":" << yOff << std::endl;
+    }
     if(IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)){
+        xOff = getRelativePositionX(GetMouseX()) - std::abs(xOff);
+        yOff = getRelativePositionY(GetMouseY()) - std::abs(yOff);
+
+        std::cout << "RECENTER TO: " << xOff << ":" << yOff << std::endl;
     }
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
         s_currentSize += s_currentSize / 100.0 * (double)(SIZECHANGEPERCENT);
@@ -77,9 +89,11 @@ void UpdateDrawFrame(void) {
                 double a = getRelativePositionX(x);
                 double b = getRelativePositionY(y);
 
+                a -= xOff;
+                b -= yOff;
+
                 const double ca = a;
                 const double cb = b;
-
 
                 //mandelbrot calculation
                 int i = 0;
