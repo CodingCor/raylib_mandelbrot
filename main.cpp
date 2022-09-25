@@ -10,14 +10,18 @@ int screenHeight = 800;
 
 const double STARTSIZE = 4.0;
 const int MAXITERATIONS = 100;
+
 const double SIZEINCREASE = 0.1;
+const int SIZECHANGEPERCENT = 10;
 
 static double s_currentSize = STARTSIZE;
-static double xOff = 0.0;
-static double yOff = 0.0;
 
 void UpdateDrawFrame(void);     // Update and Draw one frame
 void updateLogic();
+
+double getRelativePositionX(const int screenPositionX);
+double getRelativePositionY(const int screenPositionY);
+
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Mandelbrot-Set");
@@ -34,23 +38,31 @@ int main() {
     return 0;
 }
 
-void updateLogic(){
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-        s_currentSize += SIZEINCREASE;
-        std::cout << "LEFT" << std::endl;
+double getRelativePositionX(const int screenPositionX){
+    double relativeX = (double)(screenPositionX) / (double)(screenWidth) * s_currentSize;
+    relativeX -= s_currentSize / 2.0;
+    return relativeX;
+}
 
-        //int xPosition = GetMouseX();
-        //int yPosition = GetMouseY();
-        //xOff = (double)(xPosition) / (double)(screenWidth) * STARTSIZE - STARTSIZE/2.0; 
-        //yOff = (double)(yPosition) / (double)(screenHeight) * STARTSIZE - STARTSIZE/2.0;
+double getRelativePositionY(const int screenPositionY){
+    int yPosition = screenHeight - screenPositionY;
+    double relativeY =(double)(yPosition) / (double)(screenHeight) * s_currentSize;
+    relativeY -= s_currentSize / 2.0;
+    return relativeY;
+}
+
+void updateLogic(){
+    if(IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)){
+    }
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        s_currentSize += s_currentSize / 100.0 * (double)(SIZECHANGEPERCENT);
+        //s_currentSize += SIZEINCREASE;
+        //reCenterScreen();
 
     }else if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
-        s_currentSize -= SIZEINCREASE;
-        std::cout << "RIGHT" << std::endl;
-        //int xPosition = GetMouseX();
-        //int yPosition = GetMouseY();
-        //xOff = (double)(xPosition) / (double)(screenWidth) * STARTSIZE - STARTSIZE/2.0; 
-        //yOff = (double)(yPosition) / (double)(screenHeight) * STARTSIZE - STARTSIZE/2.0;
+        s_currentSize -= s_currentSize / 100.0 * (double)(SIZECHANGEPERCENT);
+        //s_currentSize -= SIZEINCREASE;
+        //reCenterScreen();
     }
 }
 
@@ -61,15 +73,15 @@ void UpdateDrawFrame(void) {
 
         for(int x = 0; x < screenWidth; x++){
             for(int y = 0; y < screenHeight; y++){
-                double a = (double)(x) / (double)(screenWidth) * s_currentSize - s_currentSize/2.0;
-                int yPosition = screenHeight - y;
-                double b = (double)(yPosition) / (double)(screenHeight) * s_currentSize - s_currentSize/2.0;
+
+                double a = getRelativePositionX(x);
+                double b = getRelativePositionY(y);
 
                 const double ca = a;
                 const double cb = b;
 
-                 //std:: cout << "a: " << a << " b: " << b << std::endl;
 
+                //mandelbrot calculation
                 int i = 0;
                 while(i < MAXITERATIONS){
 
@@ -84,13 +96,15 @@ void UpdateDrawFrame(void) {
                     }
                     i++;
                 }
+
                 //colorization
                 double bright = (double)(i) / (double)(MAXITERATIONS);
                 unsigned char brightColorValue = std::sqrt(bright) * 255.0; 
-                DrawPixel(x, y, {brightColorValue, brightColorValue, brightColorValue, 255});
+
                 if(i == MAXITERATIONS){
                     brightColorValue = 0;
                 }
+
                 DrawPixel(x, y, {brightColorValue, brightColorValue, brightColorValue, 255});
             }
         }
